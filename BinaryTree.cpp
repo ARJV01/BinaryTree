@@ -21,6 +21,9 @@ public:
   int getV() {//returns value
     return value;
   }
+  void setV(int newV) {
+    value = newV;
+  }
   Node* getR() {//returns right
     return right;
   }
@@ -42,13 +45,14 @@ public:
   ~Node() {}//destructor
 };
 
+int findC (Node* parent, int value);
 void print(Node* root,int level);
 void arrayNuller(int (&ary)[],int size);
 void add(int (&ary)[],int &size, Node* &root);
 void sort(int ary[],int counter,Node* &root);
 void find(Node* root,int value);
 Node* findR(Node* root,int value);
-void remove(Node* &root); 
+void remove(Node* &n, Node* current,Node* parrent,Node* root); 
 
 int main() {
   int ary[80];
@@ -68,7 +72,12 @@ int main() {
         print(root,0);
       }
       if (strcmp(input, "remove") == 0) {
-        remove(root);
+	  cout <<"Please enter the value you wish to remove " << endl;
+	  int findI = 0;
+	  Node* temp = root;
+	  cin >> findI;
+	  Node* n = findR(temp,findI);
+	  remove(n,root,NULL,root);
       }
       if (strcmp(input, "find") == 0) {
 	int value = 0;
@@ -163,44 +172,50 @@ void find(Node* root,int value) {//will find values
   find(root->getL(), value);//searches the left subtree
 }
 
-void remove(Node* &root) {
-  cout <<"Please enter the value you wish to remove " << endl;
-  int findI = 0;
-  Node* temp = root;
-  cin >> findI;
-  Node* r = findR(temp,findI);
-  cout << "here" << endl;
-  if(r == root) {
-    Node* tempN = root;
-    if(tempN -> getL() != NULL) {    
-      root = tempN -> getL();
-      root -> setR((temp -> getR()));
+void remove(Node* &n,Node* current,Node* parrent,Node* root) {  
+  if(n == current) {
+
+    if((n->getL() == NULL) != (n->getR() == NULL)) {//one child
+
+      if(n->getR() != NULL) {//right child exists
+	parrent = n;//sets new parent
+	int childV = n->getR() -> getV();//finds the value of the right child
+	int parentV = n ->getV();//finds value of n
+	swap(parentV,childV);//swaps value of n with value of r child
+	current = n->getR();//sets new current
+	n = findR(root, n->getR()->getV());//finds the new node with the previous value of n and sets it to n
+	remove(n,current,parrent,root);//calls the the remove funtion on the new node with the value
+      }
+
+      else {//left child exists
+	parrent = n;//sets new parent
+        int childV = n->getL() -> getV();//finds the value of the right child
+        int parentV = n ->getV();//finds value of n
+        swap(parentV,childV);//swaps value of n with value of r child
+        current = n->getL();//sets new current
+        n = findR(root, n->getL()->getV());//finds the new node with the previous value of n and sets it to n
+        remove(n,current,parrent,root);//calls the the remove funtion on the new node with the value
+      }
+
     }
-    else {
-      root = tempN -> getR();
+
+    if(n->getL() != NULL && n->getR() != NULL) {//two child
+
+    }
+
+    if((n->getL() == NULL) == (n->getR() == NULL)) {//no child
+      int side = findC(parrent, n->getV());//find out what side the node is on
+      if(side == 1) {//sets left to NULL
+	parrent -> setL(NULL);
+      }
+      else if(side == 2) {//sets right to null
+	parrent -> setR(NULL);
+      }
+      delete n;//delete the node
     }
   }
-
-  else if(r != root) {
-    cout << "here" << endl;
-    Node* tempN = r;
-    cout << "wtf" << endl;
-    if(r -> getL() != NULL) {
-      cout << "in here" << endl;
-      r = tempN -> getL();
-      r -> setR((tempN -> getR()));
-    }
-    if(r -> getL() == NULL && r ->getR() != NULL) {
-      cout << "oh shit" << endl;
-      r = tempN -> getR();
-    }
-    if(r->getL() == NULL && r->getR() == NULL) {
-      cout << "in 3 loop" << endl;
-    }
-    cout << "whiskey tango foxtrot" << endl;
-    }
-  
-
+  remove(n,current ->getR(),current,root);
+  remove(n,current->getL(),current,root);
 }
 
 Node* findR(Node* root,int value) {//will find values
@@ -214,4 +229,16 @@ Node* findR(Node* root,int value) {//will find values
   findR(root->getR(), value);//searches the left subtree
   findR(root->getL(), value);//searches the left subtree
   return NULL;
+}
+
+int findC (Node* parent, int value) {
+  if(parent->getL()->getV() == value) {
+    return 1;
+  }
+
+  if(parent ->getR()->getV() == value) {
+    return 2;
+  }
+
+  return 0;
 }
