@@ -46,7 +46,9 @@ void print(Node* root,int level);
 void arrayNuller(int (&ary)[],int size);
 void add(int (&ary)[],int &size, Node* &root);
 void sort(int ary[],int counter,Node* &root);
-
+void find(Node* root,int value);
+Node* findR(Node* root,int value);
+void remove(Node* &root); 
 
 int main() {
   int ary[80];
@@ -56,7 +58,7 @@ int main() {
   int counter =0;
   arrayNuller(ary , 80);
   while(stillR == true) {
-    cout << "enter add print or quit" << endl;
+    cout << "enter add remove print find or quit" << endl;
     cin >> input;
     cin.ignore(256, '\n');
       if (strcmp(input, "add") == 0) {
@@ -64,6 +66,15 @@ int main() {
       }
       if (strcmp(input, "print") == 0) {
         print(root,0);
+      }
+      if (strcmp(input, "remove") == 0) {
+        remove(root);
+      }
+      if (strcmp(input, "find") == 0) {
+	int value = 0;
+	cout << "please enter in a number" << endl;
+	cin >> value;
+	find(root,value);
       }
       if (strcmp(input, "quit") == 0) {
 	stillR = false;
@@ -85,8 +96,8 @@ void add(int (&ary)[], int &counter,Node* &root) { // Will add inputs from the l
   int i = 0;
   cin >> inputL;
   int input = 0;
-  cout << "enter your numbers" << endl;
   while(i < inputL) {
+    cout << "enter a number " << endl;
     cin >> input;
     cin.ignore(256, '\n');
     ary[counter] = input;
@@ -96,7 +107,7 @@ void add(int (&ary)[], int &counter,Node* &root) { // Will add inputs from the l
   }
 }
 
-void sort(int ary[],int counter,Node* &root) {
+void sort(int ary[],int counter,Node* &root) {//sorts the values from add
   if(root == NULL) {//when there is nothing in the tree
     root = new Node(ary[counter]);
     return;
@@ -107,11 +118,11 @@ void sort(int ary[],int counter,Node* &root) {
     bool right = NULL;
     while(current != NULL) {//iterate down the left or right sub trees
       parent = current;
-      if(current->getV() < ary[counter]) {//left subtree
+      if(current->getV() > ary[counter]) {//left subtree
 	current = current ->getL();
 	right = false;
       }
-      else if(current->getV() > ary[counter]) {//right subtree
+      else if(current->getV() < ary[counter]) {//right subtree
 	current = current -> getR();
 	right = true;
       }
@@ -120,21 +131,87 @@ void sort(int ary[],int counter,Node* &root) {
     if(right == true) {//set new right node
       parent ->setR(new Node(ary[counter]));
     }
-    else if(right != false) {//set new left node
+    else if(right == false) {//set new left node
       parent -> setL(new Node(ary[counter]));
     }
   }
 }
 
 void print(Node* root,int level) {//will print the tree
-  if (!root) {
+  if (!root) {//if nothing in tree or nothing left to print
     return;
   }
-  print(root->getR(), level++);
+  print(root->getR(), level + 1);//prints out the left subtree
 
   for(int i = 0; i < level; i++) {
     cout << "\t";
   }
-  cout << root->getV() << endl;
-  print(root->getL(), level++);
+  cout << root->getV() << endl;//prints the current value
+  print(root->getL(), level + 1);//prints the left subtree
+}
+
+void find(Node* root,int value) {//will find values
+  if (!root) {
+    return;
+  }
+
+  if(root -> getV() == value) {
+    cout << "The given value is in the tree" << endl;
+    return;
+  }
+  find(root->getR(), value);//searches the left subtree
+  find(root->getL(), value);//searches the left subtree
+}
+
+void remove(Node* &root) {
+  cout <<"Please enter the value you wish to remove " << endl;
+  int findI = 0;
+  Node* temp = root;
+  cin >> findI;
+  Node* r = findR(temp,findI);
+  cout << "here" << endl;
+  if(r == root) {
+    Node* tempN = root;
+    if(tempN -> getL() != NULL) {    
+      root = tempN -> getL();
+      root -> setR((temp -> getR()));
+    }
+    else {
+      root = tempN -> getR();
+    }
+  }
+
+  else if(r != root) {
+    cout << "here" << endl;
+    Node* tempN = r;
+    cout << "wtf" << endl;
+    if(r -> getL() != NULL) {
+      cout << "in here" << endl;
+      r = tempN -> getL();
+      r -> setR((tempN -> getR()));
+    }
+    if(r -> getL() == NULL && r ->getR() != NULL) {
+      cout << "oh shit" << endl;
+      r = tempN -> getR();
+    }
+    if(r->getL() == NULL && r->getR() == NULL) {
+      cout << "in 3 loop" << endl;
+    }
+    cout << "whiskey tango foxtrot" << endl;
+    }
+  
+
+}
+
+Node* findR(Node* root,int value) {//will find values
+  if (!root) {
+    return NULL;
+  }
+
+  if(root -> getV() == value) {
+    return root;
+  }
+  findR(root->getR(), value);//searches the left subtree
+  findR(root->getL(), value);//searches the left subtree
+  return NULL;
 }
