@@ -51,6 +51,7 @@ void add(int (&ary)[],int &size, Node* &root);
 void sort(int ary[],int counter,Node* &root);
 void find(Node* root,int value);
 Node* findR(Node* root,int value);
+Node* findP(Node* parent,int value); 
 void remove(Node* n,Node* parent,Node* &root); 
 
 int main() {
@@ -75,7 +76,8 @@ int main() {
 	  int findI = 0;
 	  cin >> findI;
 	  Node* n = findR(root,findI);
-	  remove(n,NULL,root);
+	  Node* parent = findP(root,findI);
+	  remove(n,parent,root);
       }
       if (strcmp(input, "find") == 0) {
 	int value = 0;
@@ -184,7 +186,8 @@ void remove(Node* n,Node* parent,Node* &root) {
               parent->setR(NULL);//sets right to null
         }
     }
-        else {
+    else{
+	  cout << "in here" << endl;
             root = NULL; // If root is being removed
         }
         delete n;
@@ -207,7 +210,7 @@ void remove(Node* n,Node* parent,Node* &root) {
                 parent->setR(child);
           }
         }
-          else {//if the root needs to be removed
+        else {//if the root needs to be removed
             root = child;
         }
         delete n;
@@ -245,3 +248,19 @@ Node* findR(Node* root, int value) {
     return findR(root->getR(), value);
 }
 
+Node* findP(Node* parent,int value) {//will find parent
+  if (!parent) {
+    return NULL;
+  }
+  if(parent -> getR() -> getV() == value) {
+    return parent;
+  }
+
+  if(parent -> getL() -> getV() == value) {
+    return parent;
+  }
+  
+  findP(parent->getR(), value);//searches the left subtree
+  findP(parent->getL(), value);//searches the left subtree
+  return NULL;
+}
