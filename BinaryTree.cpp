@@ -51,7 +51,7 @@ void add(int (&ary)[],int &size, Node* &root);
 void sort(int ary[],int counter,Node* &root);
 void find(Node* root,int value);
 Node* findR(Node* root,int value);
-void remove(Node* n,Node* parent,Node* root); 
+void remove(Node* n,Node* parent,Node* &root); 
 
 int main() {
   int ary[80];
@@ -75,7 +75,7 @@ int main() {
 	  int findI = 0;
 	  cin >> findI;
 	  Node* n = findR(root,findI);
-	  remove(n,root,NULL);
+	  remove(n,NULL,root);
       }
       if (strcmp(input, "find") == 0) {
 	int value = 0;
@@ -170,7 +170,7 @@ void find(Node* root,int value) {//will find values
   find(root->getL(), value);//searches the left subtree
 }
 
-void remove(Node* n,Node* parent,Node* root) {
+void remove(Node* n,Node* parent,Node* &root) {
   if (n == NULL) {//if n is null
     return;
   }
