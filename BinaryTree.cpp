@@ -45,14 +45,13 @@ public:
   ~Node() {}//destructor
 };
 
-int findC (Node* parent, int value);
 void print(Node* root,int level);
 void arrayNuller(int (&ary)[],int size);
 void add(int (&ary)[],int &size, Node* &root);
 void sort(int ary[],int counter,Node* &root);
 void find(Node* root,int value);
 Node* findR(Node* root,int value);
-void remove(Node* &n, Node* current,Node* parent,Node* root); 
+void remove(Node* n,Node* parent,Node* root); 
 
 int main() {
   int ary[80];
@@ -74,10 +73,9 @@ int main() {
       if (strcmp(input, "remove") == 0) {
 	  cout <<"Please enter the value you wish to remove " << endl;
 	  int findI = 0;
-	  Node* temp = root;
 	  cin >> findI;
-	  Node* n = findR(temp,findI);
-	  remove(n,root,NULL,root);
+	  Node* n = findR(root,findI);
+	  remove(n,root,NULL);
       }
       if (strcmp(input, "find") == 0) {
 	int value = 0;
@@ -172,7 +170,7 @@ void find(Node* root,int value) {//will find values
   find(root->getL(), value);//searches the left subtree
 }
 
-void remove(Node* &n,Node* current,Node* parent,Node* root) {  
+void remove(Node* n,Node* parent,Node* root) {
   if (n == NULL) {//if n is null
     return;
   }
@@ -180,13 +178,13 @@ void remove(Node* &n,Node* current,Node* parent,Node* root) {
   if (n->getL() == NULL && n->getR() == NULL) { //no children
     if (parent != NULL) {//if there is a parent
       if (parent->getL() == n) {//if n is left
-	      parent->setL(NULL);//set parent left to null
+              parent->setL(NULL);//set parent left to null
       }
       else {
-	      parent->setR(NULL);//sets right to null
+              parent->setR(NULL);//sets right to null
         }
     }
-	else {
+        else {
             root = NULL; // If root is being removed
         }
         delete n;
@@ -195,49 +193,55 @@ void remove(Node* &n,Node* current,Node* parent,Node* root) {
 
     if((n->getL() == NULL) != (n->getR() == NULL)) { //one child
         Node* child;
-	if (n->getL() != NULL) {//if left child exists
-	  child = n->getL();
-	}
-	else {//if right child exists
-	  child = n->getR();
-	}
+        if (n->getL() != NULL) {//if left child exists
+          child = n->getL();
+        }
+        else {//if right child exists
+          child = n->getR();
+        }
         if (parent != NULL) {//if there is a parent
-	  if (parent->getL() == n) {//if parents lchild is n
+          if (parent->getL() == n) {//if parents lchild is n
                 parent->setL(child);
-	  }
-	  else {//if rchild is n
+          }
+          else {//if rchild is n
                 parent->setR(child);
-	  }
-	}
-	  else {//if the root needs to be removed
+          }
+        }
+          else {//if the root needs to be removed
             root = child;
         }
         delete n;
         return;
     }
+    else {//for two child
+      Node* s = n->getR();//sets s to the r child of n
+      Node* sP = NULL;//sets s parent to NULL
+      while (s->getL() != NULL) {//while s does not have a l child
+        sP = s;//s aprent = s
+        s = s->getL();// s = s lchild
+    }
+
+      if (sP != NULL) {//if s parent exists
+        sP->setL(s->getR());//parent's left is s's right
+      }
+      else//if it dosent exist
+        n->setR(s->getR());//n's right is s's right
+
+      n->setV(s->getV());//set the value of n to the value of s
+      delete s;//delete s
+    }
 }
 
-Node* findR(Node* root,int value) {//will find values
-  if (!root) {
-    return NULL;
+Node* findR(Node* root, int value) {
+  if (root == nullptr || root->getV() == value) {
+        return root;
   }
 
-  if(root -> getV() == value) {
-    return root;
-  }
-  findR(root->getR(), value);//searches the left subtree
-  findR(root->getL(), value);//searches the left subtree
-  return NULL;
+    Node* leftResult = findR(root->getL(), value);
+    if (leftResult != nullptr) {
+        return leftResult;
+    }
+
+    return findR(root->getR(), value);
 }
 
-int findC (Node* parent, int value) {
-  if(parent->getL()->getV() == value) {
-    return 1;
-  }
-
-  if(parent ->getR()->getV() == value) {
-    return 2;
-  }
-
-  return 0;
-}
