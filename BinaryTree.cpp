@@ -52,7 +52,7 @@ void add(int (&ary)[],int &size, Node* &root);
 void sort(int ary[],int counter,Node* &root);
 void find(Node* root,int value);
 Node* findR(Node* root,int value);
-void remove(Node* &n, Node* current,Node* parrent,Node* root); 
+void remove(Node* &n, Node* current,Node* parent,Node* root); 
 
 int main() {
   int ary[80];
@@ -172,50 +172,49 @@ void find(Node* root,int value) {//will find values
   find(root->getL(), value);//searches the left subtree
 }
 
-void remove(Node* &n,Node* current,Node* parrent,Node* root) {  
-  if(n == current) {
-
-    if((n->getL() == NULL) != (n->getR() == NULL)) {//one child
-
-      if(n->getR() != NULL) {//right child exists
-	parrent = n;//sets new parent
-	int childV = n->getR() -> getV();//finds the value of the right child
-	int parentV = n ->getV();//finds value of n
-	swap(parentV,childV);//swaps value of n with value of r child
-	current = n->getR();//sets new current
-	n = findR(root, n->getR()->getV());//finds the new node with the previous value of n and sets it to n
-	remove(n,current,parrent,root);//calls the the remove funtion on the new node with the value
-      }
-
-      else {//left child exists
-	parrent = n;//sets new parent
-        int childV = n->getL() -> getV();//finds the value of the right child
-        int parentV = n ->getV();//finds value of n
-        swap(parentV,childV);//swaps value of n with value of r child
-        current = n->getL();//sets new current
-        n = findR(root, n->getL()->getV());//finds the new node with the previous value of n and sets it to n
-        remove(n,current,parrent,root);//calls the the remove funtion on the new node with the value
-      }
-
-    }
-
-    if(n->getL() != NULL && n->getR() != NULL) {//two child
-
-    }
-
-    if((n->getL() == NULL) == (n->getR() == NULL)) {//no child
-      int side = findC(parrent, n->getV());//find out what side the node is on
-      if(side == 1) {//sets left to NULL
-	parrent -> setL(NULL);
-      }
-      else if(side == 2) {//sets right to null
-	parrent -> setR(NULL);
-      }
-      delete n;//delete the node
-    }
+void remove(Node* &n,Node* current,Node* parent,Node* root) {  
+  if (n == NULL) {//if n is null
+    return;
   }
-  remove(n,current ->getR(),current,root);
-  remove(n,current->getL(),current,root);
+
+  if (n->getL() == NULL && n->getR() == NULL) { //no children
+    if (parent != NULL) {//if there is a parent
+      if (parent->getL() == n) {//if n is left
+	      parent->setL(NULL);//set parent left to null
+      }
+      else {
+	      parent->setR(NULL);//sets right to null
+        }
+    }
+	else {
+            root = NULL; // If root is being removed
+        }
+        delete n;
+        return;
+    }
+
+    if((n->getL() == NULL) != (n->getR() == NULL)) { //one child
+        Node* child;
+	if (n->getL() != NULL) {//if left child exists
+	  child = n->getL();
+	}
+	else {//if right child exists
+	  child = n->getR();
+	}
+        if (parent != NULL) {//if there is a parent
+	  if (parent->getL() == n) {//if parents lchild is n
+                parent->setL(child);
+	  }
+	  else {//if rchild is n
+                parent->setR(child);
+	  }
+	}
+	  else {//if the root needs to be removed
+            root = child;
+        }
+        delete n;
+        return;
+    }
 }
 
 Node* findR(Node* root,int value) {//will find values
