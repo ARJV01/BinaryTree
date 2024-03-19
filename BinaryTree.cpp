@@ -1,3 +1,7 @@
+//Arjun Vinsel
+//3/18/2024
+//This program makes a binary tree based on user inputs. Users can add print serach and remove nodes.
+
 #include<iostream>
 #include<cctype>
 #include<iomanip>
@@ -45,14 +49,14 @@ public:
   ~Node() {}//destructor
 };
 
-void print(Node* root,int level);
-void arrayNuller(int (&ary)[],int size);
-void add(int (&ary)[],int &size, Node* &root);
-void sort(int ary[],int counter,Node* &root);
-void find(Node* root,int value);
-Node* findR(Node* root,int value);
-Node* findP(Node* parent,int value); 
-void remove(Node* n,Node* parent,Node* &root); 
+void print(Node* root,int level);//prints out the tree
+void arrayNuller(int (&ary)[],int size);//nulls the array
+void add(int (&ary)[],int &size, Node* &root);//sorts the tree
+void sort(int ary[],int counter,Node* &root);//adds nodes to the tree
+void find(Node* root,int value);//finds values
+Node* findR(Node* root,int value);//finds nodes
+Node* findP(Node* parent,int value); //finds the parent node
+void remove(Node* n,Node* parent,Node* &root); //removes nodes
 
 int main() {
   int ary[80];
@@ -172,7 +176,7 @@ void find(Node* root,int value) {//will find values
   find(root->getL(), value);//searches the left subtree
 }
 
-void remove(Node* n,Node* parent,Node* &root) {
+void remove(Node* n,Node* parent,Node* &root) {//will remove a node
   if (n == NULL) {//if n is null
     return;
   }
@@ -187,7 +191,6 @@ void remove(Node* n,Node* parent,Node* &root) {
         }
     }
     else{
-	  cout << "in here" << endl;
             root = NULL; // If root is being removed
         }
         delete n;
@@ -235,7 +238,7 @@ void remove(Node* n,Node* parent,Node* &root) {
     }
 }
 
-Node* findR(Node* root, int value) {
+Node* findR(Node* root, int value) {//find the node
   if (root == nullptr || root->getV() == value) {
         return root;
   }
@@ -248,19 +251,18 @@ Node* findR(Node* root, int value) {
     return findR(root->getR(), value);
 }
 
-Node* findP(Node* parent,int value) {//will find parent
-  if (!parent) {
-    return NULL;
-  }
-  if(parent -> getR() -> getV() == value) {
-    return parent;
-  }
+Node* findP(Node* parent, int value) {//finds the parent node
+    if (parent == NULL) {
+        return NULL; 
+    }
 
-  if(parent -> getL() -> getV() == value) {
-    return parent;
-  }
-  
-  findP(parent->getR(), value);//searches the left subtree
-  findP(parent->getL(), value);//searches the left subtree
-  return NULL;
+    if ((parent->left != NULL && parent->left->value == value) ||
+        (parent->right != NULL && parent->right->value == value)) {
+        return parent; 
+    }
+    Node* result = findP(parent->right, value);
+    if (result != NULL) {
+        return result;
+    }
+    return findP(parent->left, value);
 }
